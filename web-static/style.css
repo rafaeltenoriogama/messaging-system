@@ -1,0 +1,56 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-image: url("./resources/background_image.jpg"); /* Roxo escuro */
+  background-size: cover; /* Faz a imagem cobrir toda a tela */
+  background-position: center; /* Centraliza a imagem */
+  background-repeat: no-repeat; /* Não repete a imagem */
+  font-family: Arial, sans-serif;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 140px;
+  height: 100vh;
+}
+
+.container {
+  width: 80%;
+  max-width: 800px;
+  background-color: #3d1f86; /* Roxo mais claro para o container */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.link-box {
+  margin-bottom: 20px;
+  background-color: #4c2580; /* Roxo ainda mais claro para as caixas */
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.link-box h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.link-box p {
+  font-size: 1em;
+  margin-bottom: 5px;
+}
+
+a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}

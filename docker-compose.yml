@@ -1,0 +1,108 @@
+version: "3.8"
+
+services:
+  zabbix-mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: zabbix
+      MYSQL_USER: zabbix
+      MYSQL_PASSWORD: zabbixpass
+      MYSQL_ROOT_PASSWORD: rootpass
+    command:
+      [
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+        "--max_allowed_packet=256M",
+        "--innodb_log_file_size=128M",
+        "--wait_timeout=28800",
+      ]
+    volumes:
+      - zabbix_mysql_data:/var/lib/mysql
+
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:alpine-latest
+    depends_on:
+      - zabbix-mysql
+    environment:
+      DB_SERVER_HOST: zabbix-mysql
+      DB_SERVER_PORT: 3306
+      MYSQL_DATABASE: zabbix
+      MYSQL_USER: zabbix
+      MYSQL_PASSWORD: zabbixpass
+    ports:
+      - "10051:10051"
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-mysql:alpine-latest
+    depends_on:
+      - zabbix-server
+    environment:
+      DB_SERVER_HOST: zabbix-mysql
+      MYSQL_USER: zabbix
+      MYSQL_PASSWORD: zabbixpass
+      PHP_TZ: Europe/Lisbon
+    ports:
+      - "8080:8080"
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent:alpine-latest
+    depends_on:
+      - zabbix-server
+    volumes:
+      - ./scripts:/usr/lib/zabbix/externalscripts
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+
+  zabbix-agent-kafka:
+    image: zabbix/zabbix-agent:alpine-latest
+    container_name: zabbix-agent-kafka
+    environment:
+      ZBX_SERVER_HOST: zabbix-server
+      HOSTNAME: Kafka-Container
+    volumes:
+      - ./scripts:/etc/zabbix/scripts:ro
+    depends_on:
+      - kafka
+    network_mode: "service:kafka"
+
+  kafka:
+    image: bitnami/kafka:3.4.0
+    ports:
+      - "9092:9092"
+      - "9999:9999" # Expose port JMX
+    environment:
+      KAFKA_ENABLE_KRAFT: "no"
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_JMX_PORT: 9999
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    ports:
+      - "2181:2181"
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  web-static:
+    image: nginx:alpine
+    volumes:
+      - ./web-static:/usr/share/nginx/html:ro
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+
+volumes:
+  zabbix_mysql_data:
+  grafana_data:
