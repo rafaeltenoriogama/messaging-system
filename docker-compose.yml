@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   zabbix-mysql:
-    image: mysql:5.7
+    image: mysql:8.0.36
     environment:
       MYSQL_DATABASE: zabbix
       MYSQL_USER: zabbix
@@ -10,11 +10,11 @@ services:
       MYSQL_ROOT_PASSWORD: rootpass
     command:
       [
-        "--character-set-server=utf8mb4",
-        "--collation-server=utf8mb4_unicode_ci",
+        "--collation-server=utf8mb4_bin",
         "--max_allowed_packet=256M",
         "--innodb_log_file_size=128M",
         "--wait_timeout=28800",
+        "--log_bin_trust_function_creators=1",
       ]
     volumes:
       - zabbix_mysql_data:/var/lib/mysql
@@ -41,6 +41,7 @@ services:
       MYSQL_USER: zabbix
       MYSQL_PASSWORD: zabbixpass
       PHP_TZ: Europe/Lisbon
+      ZBX_SERVER_HOST: zabbix-server
     ports:
       - "8080:8080"
 
@@ -63,30 +64,28 @@ services:
       - ./scripts:/etc/zabbix/scripts:ro
     depends_on:
       - kafka
-    network_mode: "service:kafka"
 
   kafka:
     image: bitnami/kafka:3.4.0
     ports:
       - "9092:9092"
-      - "9999:9999" # Expose port JMX
+      - "9999:9999" # Expose JMX
     environment:
-      KAFKA_ENABLE_KRAFT: "no"
-      KAFKA_BROKER_ID: 1
-      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_PROCESS_ROLES: "broker,controller"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@localhost:9093"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
       ALLOW_PLAINTEXT_LISTENER: "yes"
       KAFKA_JMX_PORT: 9999
-    depends_on:
-      - zookeeper
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_JMX_HOSTNAME: kafka
+      KAFKA_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
 
-  zookeeper:
-    image: bitnami/zookeeper:latest
-    ports:
-      - "2181:2181"
-    environment:
-      ALLOW_ANONYMOUS_LOGIN: "yes"
+    volumes:
+      - kafka_data:/bitnami/kafka
 
   grafana:
     image: grafana/grafana:latest
@@ -106,3 +105,4 @@ services:
 volumes:
   zabbix_mysql_data:
   grafana_data:
+  kafka_data:
