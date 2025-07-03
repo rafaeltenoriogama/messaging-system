@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   zabbix-mysql:
     image: mysql:8.0.36
@@ -18,6 +16,8 @@ services:
       ]
     volumes:
       - zabbix_mysql_data:/var/lib/mysql
+    networks:
+      - messaging-net
 
   zabbix-server:
     image: zabbix/zabbix-server-mysql:alpine-latest
@@ -31,6 +31,8 @@ services:
       MYSQL_PASSWORD: zabbixpass
     ports:
       - "10051:10051"
+    networks:
+      - messaging-net
 
   zabbix-web:
     image: zabbix/zabbix-web-nginx-mysql:alpine-latest
@@ -44,6 +46,8 @@ services:
       ZBX_SERVER_HOST: zabbix-server
     ports:
       - "8080:8080"
+    networks:
+      - messaging-net
 
   zabbix-agent:
     image: zabbix/zabbix-agent:alpine-latest
@@ -53,6 +57,8 @@ services:
       - ./scripts:/usr/lib/zabbix/externalscripts
     environment:
       ZBX_SERVER_HOST: zabbix-server
+    networks:
+      - messaging-net
 
   zabbix-agent-kafka:
     image: zabbix/zabbix-agent:alpine-latest
@@ -64,6 +70,8 @@ services:
       - ./scripts:/etc/zabbix/scripts:ro
     depends_on:
       - kafka
+    networks:
+      - messaging-net
 
   kafka:
     image: bitnami/kafka:3.4.0
@@ -83,16 +91,21 @@ services:
       KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_JMX_HOSTNAME: kafka
       KAFKA_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
-
     volumes:
       - kafka_data:/bitnami/kafka
+    networks:
+      - messaging-net
 
   grafana:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
+    environment:
+      - GF_INSTALL_PLUGINS=alexanderzobnin-zabbix-app
     volumes:
       - grafana_data:/var/lib/grafana
+    networks:
+      - messaging-net
 
   web-static:
     image: nginx:alpine
@@ -101,8 +114,14 @@ services:
     ports:
       - "8081:80"
     restart: unless-stopped
+    networks:
+      - messaging-net
 
 volumes:
   zabbix_mysql_data:
   grafana_data:
   kafka_data:
+
+networks:
+  messaging-net:
+    name: messaging-net
