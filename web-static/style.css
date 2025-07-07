@@ -5,10 +5,10 @@
 }
 
 body {
-  background-image: url("./resources/background_image.jpg"); /* Roxo escuro */
-  background-size: cover; /* Faz a imagem cobrir toda a tela */
-  background-position: center; /* Centraliza a imagem */
-  background-repeat: no-repeat; /* Não repete a imagem */
+  background-image: url("./web-static-page.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   font-family: Arial, sans-serif;
   color: #ffffff;
   display: flex;
@@ -21,7 +21,7 @@ body {
 .container {
   width: 80%;
   max-width: 800px;
-  background-color: #3d1f86; /* Roxo mais claro para o container */
+  background-color: #33234a;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -29,7 +29,7 @@ body {
 
 .link-box {
   margin-bottom: 20px;
-  background-color: #4c2580; /* Roxo ainda mais claro para as caixas */
+  background-color: #4c2580;
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
