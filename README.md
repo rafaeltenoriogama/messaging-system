@@ -1,5 +1,53 @@
 ![Display Screen Page](./resources/screen_page.png)
 
-# A messaging system with monitoring
+# Kafka Monitoring and Messaging System
 
-A system design based of Kafka for streaming, Zabbix to monitoring server services and Grafana to show dashboards.
+This project sets up a simple Apache Kafka messaging environment using Docker Compose, with monitoring tools and a web interface for topic inspection.
+
+## Features
+
+- **Apache Kafka** – for producing and consuming messages
+- **Redpanda Console** – modern Kafka UI for topic inspection
+- **AKHQ** – alternative Kafka UI
+- **Zabbix** – for infrastructure and Kafka monitoring
+- **Grafana** – for dashboard visualization
+- **Python examples** – basic Kafka producer and consumer scripts
+- **Custom Web Page** – served via Nginx
+
+## Usage
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/your-username/your-repo-name.git
+    cd your-repo-name
+    ```
+
+2. Running the docker
+
+    ```bash
+    docker-compose up -d
+    ```
+
+    Access interfaces:
+
+         Redpanda Console: http://localhost:8082
+
+         AKHQ: http://localhost:8083
+
+         Zabbix: http://localhost:8080
+
+        Grafana: [No?](http://localhost:3000)
+
+         Static Web (Nginx): http://localhost:8081
+
+    Python scripts:
+
+         Located in the kafka/ folder.
+
+         Run them using Python 3 with the kafka-python library installed.
+
+**Notes**:
+
+There are many ways to interact with Kafka: using Python, Spark, Spring Boot, etc.
+This repository only provides Python examples for simplicity.
