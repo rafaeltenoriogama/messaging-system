@@ -1,23 +1,24 @@
-# Kafka Producer using Python
+from kafka import KafkaProducer
+import json
+import time
 
-from confluent_kafka import Producer
+producer = KafkaProducer(
+    bootstrap_servers="172.19.0.2:9092",  # IP interno do container Kafka
+    value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+)
 
-conf = {"bootstrap.servers": "localhost:9092"}
+topic = "ghibli-filmes"
 
-producer = Producer(conf)
+mensagens = [
+    {"titulo": "A Viagem de Chihiro", "diretor": "Hayao Miyazaki"},
+    {"titulo": "Meu Amigo Totoro", "diretor": "Hayao Miyazaki"},
+    {"titulo": "O Castelo Animado", "diretor": "Hayao Miyazaki"},
+]
 
-
-def delivery_report(err, msg):
-    if err is not None:
-        print(f"Error sending messages: {err}")
-    else:
-        print(f"Delivered at {msg.topic()} [{msg.partition()}]")
-
-
-for i in range(10):
-    data = f"message {i}"
-    producer.produce("my-topic", value=data.encode("utf-8"),
-                     callback=delivery_report)
-    producer.poll(0)
+for msg in mensagens:
+    producer.send(topic, msg)
+    print(f"Enviado: {msg}")
+    time.sleep(1)
 
 producer.flush()
+
