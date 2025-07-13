@@ -37,7 +37,7 @@ This project sets up a simple Apache Kafka messaging environment using Docker Co
 
          Zabbix: http://localhost:8080
 
-        Grafana: [No?](http://localhost:3000)
+        Grafana: http://localhost:3000
 
          Static Web (Nginx): http://localhost:8081
 
