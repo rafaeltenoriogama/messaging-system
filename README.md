@@ -2,11 +2,11 @@
 
 # Kafka Monitoring and Messaging System
 
-This project sets up a simple Apache Kafka messaging environment using Docker Compose, with monitoring tools and a web interface for topic inspection.
+This project sets up a simple Apache Kafka messaging environment using Docker environment, with monitoring tools and a web interface for topic inspection.
 
 ## Features
 
-- **Apache Kafka** – for producing and consuming messages
+- **Apache Kafka** (Bitnami image) – for producing and consuming messages
 - **Redpanda Console** – modern Kafka UI for topic inspection
 - **AKHQ** – alternative Kafka UI
 - **Zabbix** – for infrastructure and Kafka monitoring
